@@ -2,6 +2,8 @@ import { supabase } from "@/app/lib/supabase";
 import ProductCard from "./Components/ProductCard";
 import Header from "./Components/Header";
 import CategoryFilter from "./Components/CategoryFilter";
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // 1. Modificamos la función para aceptar "query" (búsqueda)
 async function getProducts(query: string = "", category: string = "") {

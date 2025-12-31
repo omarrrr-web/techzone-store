@@ -1,9 +1,8 @@
-"use client"; // <--- Esto permite usar onClick
+"use client";
 import { useCart } from "@/app/store/useCart";
 import { toast } from "sonner";
 import Link from "next/link";
 
-// Definimos qué datos recibe la tarjeta
 interface ProductCardProps {
     product: {
         id: number;
@@ -12,15 +11,18 @@ interface ProductCardProps {
         image: string;
         category: string;
         description: string;
+        stock: number;
     };
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-    // Traemos la función del carrito
     const addToCart = useCart((state) => state.addToCart);
 
+    // Asegúrate de que stock sea tratado como número, por si viene como string de la DB
+    const isOutOfStock = Number(product.stock) <= 0;
+
     return (
-        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow group flex flex-col h-full">
+        <div className={`bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow group flex flex-col h-full ${isOutOfStock ? 'opacity-75 grayscale' : ''}`}>
             <div className="h-64 overflow-hidden relative bg-white flex items-center justify-center p-4">
                 <Link href={`/product/${product.id}`} className="w-full h-full flex items-center justify-center cursor-pointer">
                     <img
@@ -29,6 +31,11 @@ export default function ProductCard({ product }: ProductCardProps) {
                         className="object-contain h-full w-full group-hover:scale-110 transition-transform duration-300"
                     />
                 </Link>
+                {isOutOfStock && (
+                    <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-sm z-10">
+                        AGOTADO
+                    </div>
+                )}
             </div>
 
             <div className="p-5 flex flex-col flex-grow">
@@ -51,14 +58,18 @@ export default function ProductCard({ product }: ProductCardProps) {
 
                     <button
                         onClick={() => {
-                            addToCart(product);
-                            toast.success(`Agregaste ${product.name}`, {
-                                description: "Se añadió al carrito correctamente 🛒"
-                            });
+                            if (!isOutOfStock) {
+                                addToCart(product);
+                                toast.success(`Agregaste ${product.name}`);
+                            }
                         }}
-                        className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition active:scale-95 cursor-pointer"
+                        disabled={isOutOfStock}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition active:scale-95 ${isOutOfStock
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-slate-900 text-white hover:bg-slate-800 cursor-pointer"
+                            }`}
                     >
-                        Agregar +
+                        {isOutOfStock ? "Sin Stock" : "Agregar +"}
                     </button>
                 </div>
             </div>
