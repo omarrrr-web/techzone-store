@@ -22,11 +22,8 @@ export default function CartPage() {
         });
         message += `%0A*TOTAL: S/ ${(total * 3.7).toFixed(2)}*`;
 
-        // 2. Abrir WhatsApp (Reemplaza con tu número real)
+        // 2. Abrir WhatsApp
         window.open(`https://wa.me/51984932392?text=${message}`, "_blank");
-
-        // 3. Limpiar carrito (opcional)
-        // clearCart(); 
     };
 
     return (

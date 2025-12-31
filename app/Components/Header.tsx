@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useCart } from "@/app/store/useCart";
 import SearchBox from "./SearchBox";
+import { Suspense } from "react";
 
 export default function Header() {
     const cart = useCart((state) => state.cart);
@@ -13,7 +14,9 @@ export default function Header() {
                 <Link href="/" className="text-2xl font-bold text-blue-600 hover:opacity-80 transition">
                     TechZone ⚡
                 </Link>
-                <SearchBox />
+                <Suspense fallback={<div className="w-64 h-10 bg-gray-100 rounded-lg animate-pulse" />}>
+                    <SearchBox />
+                </Suspense>
                 {/* El botón ahora es un Link a /cart */}
                 <Link
                     href="/cart"
