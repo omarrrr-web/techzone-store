@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -14,7 +15,6 @@ export default function LoginPage() {
         e.preventDefault();
         setLoading(true);
 
-        // 1. Intentamos iniciar sesión con Supabase
         const { error } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -26,41 +26,40 @@ export default function LoginPage() {
             });
             setLoading(false);
         } else {
-            toast.success("¡Bienvenido Admin! 👋");
-            // 2. Si todo sale bien, nos vamos al panel
-            router.push("/admin");
-            // router.refresh(); // A veces ayuda a actualizar el estado de la sesión
+            toast.success("¡Bienvenido! 👋");
+            router.push("/"); // Redirigimos al Home (o /admin si prefieres)
+            router.refresh();
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-            <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+            <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-gray-100">
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-blue-600">TechZone Admin 🔒</h1>
-                    <p className="text-gray-500 text-sm">Ingresa tus credenciales de administrador</p>
+                    <h1 className="text-3xl font-bold text-slate-900">Iniciar Sesión</h1>
+                    <p className="text-slate-500 mt-2">Accede a tu cuenta TechZone</p>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-6">
+                <form onSubmit={handleLogin} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                        <label className="block text-sm font-bold text-slate-700 mb-1">Correo Electrónico</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900"
-                            placeholder="admin@techzone.com"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none transition text-slate-900"
+                            placeholder="tu@email.com"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                        <label className="block text-sm font-bold text-slate-700 mb-1">Contraseña</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none transition text-slate-900"
                             required
                         />
                     </div>
@@ -68,11 +67,19 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="cursor-pointer w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-900/20 disabled:opacity-50 cursor-pointer"
                     >
-                        {loading ? "Verificando..." : "Ingresar al Panel"}
+                        {loading ? "Verificando..." : "Ingresar"}
                     </button>
                 </form>
+
+                {/* 2. AGREGAMOS EL ENLACE DE REGISTRO AQUÍ */}
+                <p className="text-center text-slate-500 mt-6 text-sm">
+                    ¿No tienes cuenta?{" "}
+                    <Link href="/register" className="text-blue-600 font-bold hover:underline cursor-pointer">
+                        Regístrate aquí
+                    </Link>
+                </p>
             </div>
         </div>
     );

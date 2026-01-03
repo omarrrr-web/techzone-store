@@ -3,7 +3,8 @@ import Link from "next/link";
 import { useCart } from "@/app/store/useCart";
 import SearchBox from "./SearchBox";
 import { Suspense } from "react";
-import { ShoppingBag, Menu } from "lucide-react"; // Iconos nuevos
+import { ShoppingBag, Menu } from "lucide-react";
+import UserMenu from "./UserMenu";
 
 export default function Header() {
     const cart = useCart((state) => state.cart);
@@ -21,13 +22,16 @@ export default function Header() {
                 </Link>
 
                 {/* 2. Buscador (Centro y amplio) */}
-                <div className="flex-1 max-w-xl hidden md:block">
+                {/* Buscador (Centro y amplio) */}
+                <div className="flex-1 max-w-2xl hidden md:block px-8"> {/* Agregué px-8 para separarlo del logo */}
                     <Suspense fallback={<div className="w-full h-10 bg-gray-100 rounded-full animate-pulse" />}>
                         <SearchBox />
                     </Suspense>
                 </div>
 
                 {/* 3. Acciones */}
+                <UserMenu />
+                <div className="h-6 w-px bg-gray-200 hidden md:block"></div>
                 <div className="flex items-center gap-6">
                     <Link
                         href="/cart"
