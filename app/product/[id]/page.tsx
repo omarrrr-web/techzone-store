@@ -11,7 +11,7 @@ async function getProduct(id: string) {
         .single();
 
     if (error) {
-        console.error("Error fetching product:", error); // Esto nos ayudará a ver errores en la consola
+        console.error("Error fetching product:", error);
         return null;
     }
 

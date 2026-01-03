@@ -2,6 +2,7 @@
 import { useCart } from "@/app/store/useCart";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Plus, ShoppingCart } from "lucide-react";
 
 interface ProductCardProps {
     product: {
@@ -17,59 +18,69 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
     const addToCart = useCart((state) => state.addToCart);
-
-    // Asegúrate de que stock sea tratado como número, por si viene como string de la DB
     const isOutOfStock = Number(product.stock) <= 0;
 
     return (
-        <div className={`bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow group flex flex-col h-full ${isOutOfStock ? 'opacity-75 grayscale' : ''}`}>
-            <div className="h-64 overflow-hidden relative bg-white flex items-center justify-center p-4">
+        <div className={`group bg-white rounded-2xl border border-gray-100 hover:border-blue-100 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 flex flex-col h-full relative overflow-hidden ${isOutOfStock ? 'opacity-60' : ''}`}>
+
+            {/* Badge de Stock */}
+            {isOutOfStock && (
+                <div className="absolute top-3 left-3 bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full border border-red-100 z-10">
+                    AGOTADO
+                </div>
+            )}
+
+            {/* Imagen*/}
+            <div className="h-64 p-6 flex items-center justify-center bg-white relative">
                 <Link href={`/product/${product.id}`} className="w-full h-full flex items-center justify-center cursor-pointer">
                     <img
                         src={product.image}
                         alt={product.name}
-                        className="object-contain h-full w-full group-hover:scale-110 transition-transform duration-300"
+                        className="object-contain h-full w-full group-hover:scale-110 transition-transform duration-500 ease-out"
                     />
                 </Link>
-                {isOutOfStock && (
-                    <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-sm z-10">
-                        AGOTADO
-                    </div>
-                )}
             </div>
 
-            <div className="p-5 flex flex-col flex-grow">
-                <div>
-                    <span className="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-full uppercase">
+            {/* Contenido */}
+            <div className="p-5 flex flex-col flex-grow bg-white">
+                <div className="mb-auto">
+                    <p className="text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
                         {product.category}
-                    </span>
-                    <h3 className="text-lg font-bold text-gray-800 mt-2 leading-tight">
-                        {product.name}
-                    </h3>
-                    <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                        {product.description}
                     </p>
+                    <Link href={`/product/${product.id}`} className="cursor-pointer">
+                        <h3 className="text-base font-bold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2 mb-2">
+                            {product.name}
+                        </h3>
+                    </Link>
                 </div>
 
-                <div className="flex justify-between items-center mt-auto pt-4">
-                    <span className="text-xl font-bold text-gray-900">
-                        {new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(product.price * 3.7)}
-                    </span>
+                {/* Precio y Botón */}
+                <div className="flex items-end justify-between pt-4 border-t border-gray-50 mt-4">
+                    <div className="flex flex-col">
+                        <span className="text-xs text-slate-400 font-medium">Precio</span>
+                        <span className="text-xl font-extrabold text-slate-900">
+                            {new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(product.price * 3.7)}
+                        </span>
+                    </div>
 
                     <button
                         onClick={() => {
                             if (!isOutOfStock) {
                                 addToCart(product);
-                                toast.success(`Agregaste ${product.name}`);
+                                toast.success("Producto agregado", {
+                                    description: `${product.name} ya está en tu carrito`,
+                                    icon: <ShoppingCart className="w-4 h-4" />
+                                });
                             }
                         }}
                         disabled={isOutOfStock}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition active:scale-95 ${isOutOfStock
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-slate-900 text-white hover:bg-slate-800 cursor-pointer"
+                        className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm ${isOutOfStock
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-slate-900 text-white hover:bg-blue-600 hover:scale-110 cursor-pointer shadow-slate-900/20"
                             }`}
+                        title="Agregar al carrito"
                     >
-                        {isOutOfStock ? "Sin Stock" : "Agregar +"}
+                        <Plus className="w-5 h-5" />
                     </button>
                 </div>
             </div>

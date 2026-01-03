@@ -21,7 +21,8 @@ async function getProducts(query: string = "", category: string = "") {
     supabaseQuery = supabaseQuery.eq('category', category);
   }
 
-  const { data: products } = await supabaseQuery;
+  const { data: products, error } = await supabaseQuery;
+
   return products || [];
 }
 

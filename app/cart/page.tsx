@@ -1,106 +1,125 @@
 "use client";
 import { useCart } from "@/app/store/useCart";
-import Header from "@/app/Components/Header";
+import Header from "../Components/Header";
 import Link from "next/link";
+import { Trash2, ArrowLeft, MessageCircle, CreditCard } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
-    // Traemos el carrito y las funciones para borrar
     const { cart, removeFromCart, clearCart } = useCart();
-
-    // Calcular el TOTAL (Suma de precios)
-    // reduce es una función de JS para sumar arrays
     const total = cart.reduce((sum, item) => sum + item.price, 0);
 
-    // Función para generar el mensaje de WhatsApp
     const handleCheckout = () => {
         if (cart.length === 0) return;
-
-        // 1. Crear el mensaje de texto
-        let message = "Hola TechZone, quiero pedir lo siguiente:%0A%0A"; // %0A es salto de línea
+        let message = "Hola TechZone, quiero pedir lo siguiente:%0A%0A";
         cart.forEach((product) => {
             message += `- ${product.name} (S/ ${product.price * 3.7})%0A`;
         });
         message += `%0A*TOTAL: S/ ${(total * 3.7).toFixed(2)}*`;
-
-        // 2. Abrir WhatsApp
         window.open(`https://wa.me/51984932392?text=${message}`, "_blank");
     };
 
     return (
-        <main className="min-h-screen bg-gray-100">
+        <main className="min-h-screen bg-gray-50">
             <Header />
 
-            <div className="max-w-4xl mx-auto px-4 py-12">
-                <h1 className="text-3xl font-bold text-gray-800 mb-8">Tu Carrito de Compras</h1>
+            <div className="max-w-6xl mx-auto px-4 py-12">
+                <div className="flex items-center gap-4 mb-8">
+                    <Link href="/" className="p-2 rounded-full hover:bg-gray-200 transition cursor-pointer">
+                        <ArrowLeft className="w-5 h-5 text-slate-600" />
+                    </Link>
+                    <h1 className="text-3xl font-bold text-slate-900">Tu Carrito</h1>
+                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold">
+                        {cart.length} items
+                    </span>
+                </div>
 
                 {cart.length === 0 ? (
-                    // ESTADO VACÍO
-                    <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
-                        <p className="text-xl text-gray-500 mb-6">Tu carrito está vacío 😢</p>
-                        <Link href="/" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-bold">
-                            Volver a la Tienda
+                    <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-dashed border-gray-200">
+                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                            <ShoppingBag className="w-10 h-10 text-gray-300" />
+                        </div>
+                        <p className="text-xl text-slate-500 mb-6 font-medium">Tu carrito está vacío</p>
+                        <Link href="/" className="bg-slate-900 text-white px-8 py-3 rounded-xl hover:bg-slate-800 font-bold transition cursor-pointer shadow-lg shadow-slate-900/20">
+                            Explorar Tienda
                         </Link>
                     </div>
                 ) : (
-                    // LISTA DE PRODUCTOS
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                        {/* Columna Izquierda: Los productos */}
-                        <div className="md:col-span-2 space-y-4">
+                        {/* LISTA DE PRODUCTOS */}
+                        <div className="lg:col-span-2 space-y-4">
                             {cart.map((product, index) => (
-                                // Usamos index como key por si agregas el mismo producto 2 veces
-                                <div key={`${product.id}-${index}`} className="bg-white p-4 rounded-xl shadow-sm flex gap-4 items-center">
-                                    <img src={product.image} alt={product.name} className="w-20 h-20 object-contain" />
+                                <div key={`${product.id}-${index}`} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition flex gap-6 items-center">
+                                    <div className="w-24 h-24 bg-gray-50 rounded-xl flex-shrink-0 flex items-center justify-center p-2">
+                                        <img src={product.image} alt={product.name} className="w-full h-full object-contain mix-blend-multiply" />
+                                    </div>
                                     <div className="flex-grow">
-                                        <h3 className="font-bold text-gray-800">{product.name}</h3>
-                                        <p className="text-blue-600 font-bold">
+                                        <span className="text-xs text-blue-600 font-bold uppercase tracking-wider">{product.category}</span>
+                                        <h3 className="font-bold text-slate-900 text-lg leading-tight mb-1">{product.name}</h3>
+                                        <p className="text-slate-500 text-sm">Garantía incluida</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-lg font-extrabold text-slate-900 mb-2">
                                             {new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(product.price * 3.7)}
                                         </p>
+                                        <button
+                                            onClick={() => removeFromCart(product.id)}
+                                            className="text-gray-400 hover:text-red-500 p-2 hover:bg-red-50 rounded-lg transition cursor-pointer"
+                                            title="Eliminar"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={() => removeFromCart(product.id)}
-                                        className="cursor-pointer text-red-500 hover:bg-red-50 p-2 rounded-lg transition"
-                                        title="Eliminar"
-                                    >
-                                        🗑️
-                                    </button>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Columna Derecha: El Resumen y Pago */}
-                        <div className="bg-white p-6 rounded-xl shadow-sm h-fit sticky top-24">
-                            <h2 className="text-xl font-bold text-gray-800 mb-4">Resumen</h2>
+                        {/* RESUMEN DE PAGO (Sticky) */}
+                        <div className="lg:col-span-1">
+                            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-lg shadow-gray-200/50 sticky top-28">
+                                <h2 className="text-xl font-bold text-slate-900 mb-6">Resumen de Orden</h2>
 
-                            <div className="flex justify-between mb-2 text-gray-600">
-                                <span>Subtotal</span>
-                                <span>S/ {(total * 3.7).toFixed(2)}</span>
+                                <div className="space-y-3 mb-6 border-b border-gray-100 pb-6">
+                                    <div className="flex justify-between text-slate-500">
+                                        <span>Subtotal</span>
+                                        <span>S/ {(total * 3.7).toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-slate-500">
+                                        <span>Impuestos (IGV)</span>
+                                        <span>Calculado</span>
+                                    </div>
+                                    <div className="flex justify-between text-green-600 font-medium">
+                                        <span>Envío</span>
+                                        <span>Gratis 🚚</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-end mb-8">
+                                    <span className="text-slate-900 font-bold">Total a Pagar</span>
+                                    <span className="text-3xl font-extrabold text-slate-900">
+                                        {new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(total * 3.7)}
+                                    </span>
+                                </div>
+                                {/* BOTÓN IR A CHECKOUT */}
+                                <Link href="/checkout">
+                                    <button className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-600 transition flex justify-center items-center gap-3 shadow-xl shadow-slate-900/20 mb-3 cursor-pointer">
+                                        <CreditCard className="w-6 h-6" />
+                                        Ir a Pagar
+                                    </button>
+                                </Link>
+                                <button
+                                    onClick={handleCheckout}
+                                    className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition flex justify-center items-center gap-3 shadow-xl shadow-green-600/20 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                                >
+                                    <MessageCircle className="w-6 h-6" />
+                                    Completar en WhatsApp
+                                </button>
+
+                                <button onClick={clearCart} className="w-full mt-4 text-slate-400 text-sm hover:text-red-500 font-medium cursor-pointer transition">
+                                    Vaciar Carrito
+                                </button>
                             </div>
-                            <div className="flex justify-between mb-6 text-gray-600">
-                                <span>Envío</span>
-                                <span className="text-green-600 font-medium">Gratis</span>
-                            </div>
-
-                            <div className="border-t pt-4 flex justify-between items-center mb-6">
-                                <span className="text-2xl font-bold text-gray-900">Total</span>
-                                <span className="text-2xl font-bold text-blue-600">
-                                    {new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(total * 3.7)}
-                                </span>
-                            </div>
-
-                            <button
-                                onClick={handleCheckout}
-                                className="cursor-pointer w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition flex justify-center items-center gap-2 shadow-lg shadow-green-500/20"
-                            >
-                                📱 Pedir por WhatsApp
-                            </button>
-
-                            <button
-                                onClick={clearCart}
-                                className="cursor-pointer w-full mt-4 text-gray-400 text-sm hover:text-red-500 underline"
-                            >
-                                Vaciar Carrito
-                            </button>
                         </div>
 
                     </div>
