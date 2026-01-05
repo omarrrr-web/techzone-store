@@ -1,16 +1,27 @@
 "use client";
 import { useState } from "react";
+import { useEffect } from "react";
 import { useCart } from "@/app/store/useCart";
 import Header from "@/app/Components/Header";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { CreditCard, Truck } from "lucide-react";
+import { supabase } from "@/app/lib/supabase";
 
 export default function CheckoutPage() {
+    const [userId, setUserId] = useState<string | null>(null);
     const { cart } = useCart();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) setUserId(session.user.id);
+        };
+        getUser();
+    }, []);
 
     // Estado del formulario
     const [formData, setFormData] = useState({
@@ -36,6 +47,7 @@ export default function CheckoutPage() {
                 body: JSON.stringify({
                     items: cart,
                     customerInfo: formData,
+                    userId: userId,
                 }),
             });
 
